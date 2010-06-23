@@ -9,6 +9,9 @@
 
 package com.northscale.jvbucket;
 
+import com.northscale.jvbucket.model.HashAlgorithm;
+import com.northscale.jvbucket.model.VBucket;
+
 import java.util.List;
 
 /**

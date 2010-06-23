@@ -71,6 +71,7 @@
             <version>2.5.4</version>
             <scope>test</scope>
         </dependency>
+		<!--
         <dependency>
             <groupId>org.springmodules</groupId>
             <artifactId>spring-modules-validation</artifactId>
@@ -86,6 +87,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+		-->
         <!-- Commons dependencies -->
         <dependency>
             <groupId>commons-collections</groupId>

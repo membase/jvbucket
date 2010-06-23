@@ -7,7 +7,7 @@
  *
  */
 
-package com.northscale.jvbucket;
+package com.northscale.jvbucket.exception;
 
 /**
  * @author Eugene Shelestovich

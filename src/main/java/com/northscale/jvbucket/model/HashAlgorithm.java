@@ -7,7 +7,7 @@
  *
  */
 
-package com.northscale.jvbucket;
+package com.northscale.jvbucket.model;
 
 /**
  * @author Eugene Shelestovich

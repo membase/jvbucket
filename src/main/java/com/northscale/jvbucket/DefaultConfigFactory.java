@@ -9,6 +9,9 @@
 
 package com.northscale.jvbucket;
 
+import com.northscale.jvbucket.exception.ConfigParsingException;
+import com.northscale.jvbucket.model.HashAlgorithm;
+import com.northscale.jvbucket.model.VBucket;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,13 +65,21 @@ public class DefaultConfigFactory implements ConfigFactory {
         if (jsonObject.has("vBucketServerMap")) {
             return parseJSON(jsonObject.getJSONObject("vBucketServerMap"));
         }
-        //TODO: add values validation here
         HashAlgorithm hashAlgorithm = HashAlgorithm.parse(jsonObject.getString("hashAlgorithm"));
         int replicasCount = jsonObject.getInt("numReplicas");
+        if (replicasCount > VBucket.MAX_REPLICAS) {
+            throw new ConfigParsingException("Expected number <= " + VBucket.MAX_REPLICAS + " for replicas.");
+        }
         JSONArray servers = jsonObject.getJSONArray("serverList");
+        if (servers.length() <= 0) {
+            throw new ConfigParsingException("Empty servers list.");
+        }
         int serversCount = servers.length();
         JSONArray vbuckets = jsonObject.getJSONArray("vBucketMap");
         int vbucketsCount = vbuckets.length();
+        if (vbucketsCount == 0 || (vbucketsCount & (vbucketsCount - 1)) != 0) {
+            throw new ConfigParsingException("Number of buckets must be a power of two, > 0 and <= " + VBucket.MAX_BUCKETS);
+        }
 
         Config config = new DefaultConfig(hashAlgorithm, serversCount, replicasCount, vbucketsCount);
         populateServers(config, servers);

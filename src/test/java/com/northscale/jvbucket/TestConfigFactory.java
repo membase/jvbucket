@@ -10,7 +10,11 @@
 package com.northscale.jvbucket;
 
 import static org.junit.Assert.assertEquals;
+
+import com.northscale.jvbucket.model.HashAlgorithm;
 import org.junit.Test;
+
+import java.net.URL;
 
 /**
  * @author Eugene Shelestovich
@@ -31,7 +35,7 @@ public class TestConfigFactory {
                     "    ]\n" +
                     "}";
 
-    static final String configFlat =
+    private static final String configFlat =
             "{" +
                     "  \"hashAlgorithm\": \"CRC\"," +
                     "  \"numReplicas\": 2," +
@@ -45,7 +49,7 @@ public class TestConfigFactory {
                     "    ]" +
                     "}";
 
-    static final String configInEnvelope =
+    private static final String configInEnvelope =
             "{ \"otherKeyThatIsIgnored\": 12345,\n" +
                     "\"vBucketServerMap\": \n" +
                     "{\n" +
@@ -62,10 +66,21 @@ public class TestConfigFactory {
                     "}" +
                     "}";
 
+    private static final String filename = "test.json";
 
     private void doTest(String json) {
         ConfigFactory cf = new DefaultConfigFactory();
         Config config = cf.createConfigFromString(json);
+        validate(config);
+    }
+
+    private void doTestWithFile(String filename) {
+        ConfigFactory cf = new DefaultConfigFactory();
+        Config config = cf.createConfigFromFile(filename);
+        validate(config);
+    }
+
+    private void validate(Config config) {
         assertEquals(3, config.getServersCount());
         assertEquals(2, config.getReplicasCount());
         assertEquals(4, config.getVbucketsCount());
@@ -98,5 +113,11 @@ public class TestConfigFactory {
     @Test
     public void testConfigInEnvelope() {
         doTest(configInEnvelope);
+    }
+
+    @Test
+    public void testConfigFromFile() {
+        URL url = this.getClass().getClassLoader().getResource(filename);
+        doTestWithFile(url.getFile());
     }
 }

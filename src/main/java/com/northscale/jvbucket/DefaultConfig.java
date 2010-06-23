@@ -9,6 +9,8 @@
 
 package com.northscale.jvbucket;
 
+import com.northscale.jvbucket.model.HashAlgorithm;
+import com.northscale.jvbucket.model.VBucket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
