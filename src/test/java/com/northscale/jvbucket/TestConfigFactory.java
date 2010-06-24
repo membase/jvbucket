@@ -207,5 +207,4 @@ public class TestConfigFactory {
         assertEquals(0, cfg.foundIncorrectMaster(0, 2));
         assertEquals(0, cfg.getMaster(0));
     }
-
 }

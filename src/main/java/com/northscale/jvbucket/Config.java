@@ -51,6 +51,4 @@ public interface Config {
     List<String> getServers();
 
     List<VBucket> getVbuckets();
-
-
 }
