@@ -9,11 +9,14 @@
 
 package com.northscale.jvbucket;
 
-import com.northscale.jvbucket.model.HashAlgorithm;
+import com.northscale.jvbucket.model.ConfigDifference;
 import com.northscale.jvbucket.model.VBucket;
+import net.spy.memcached.HashAlgorithm;
+import org.apache.commons.collections15.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +26,7 @@ public class DefaultConfig implements Config {
 
     private final Log LOG = LogFactory.getLog(this.getClass());
 
-    private HashAlgorithm hashAlgorithm = HashAlgorithm.DEFAULT;
+    private HashAlgorithm hashAlgorithm = HashAlgorithm.NATIVE_HASH;
 
     private int vbucketsCount;
 
@@ -65,9 +68,8 @@ public class DefaultConfig implements Config {
         return servers.get(serverIndex);
     }
 
-    public int getVbucketByKey(Object key, int nkey) {
-        // TODO
-        int digest = 0;
+    public int getVbucketByKey(String key) {
+        int digest = (int) hashAlgorithm.hash(key);
         return digest & mask;
     }
 
@@ -95,7 +97,52 @@ public class DefaultConfig implements Config {
         this.vbuckets = vbuckets;
     }
 
+    public List<String> getServers() {
+        return servers;
+    }
+
+    public List<VBucket> getVbuckets() {
+        return vbuckets;
+    }
+
+    public ConfigDifference compareTo(Config config) {
+        ConfigDifference difference = new ConfigDifference();
+
+        // Compute the added and removed servers 
+        difference.setServersAdded(new ArrayList<String>(CollectionUtils.subtract(config.getServers(), this.getServers())));
+        difference.setServersRemoved(new ArrayList<String>(CollectionUtils.subtract(this.getServers(), config.getServers())));
+
+        // Verify the servers are equal in their positions
+        if (this.serversCount == config.getServersCount()) {
+            difference.setSequenceChanged(false);
+            for (int i = 0; i < this.serversCount; i++) {
+                if (!this.getServer(i).equals(config.getServer(i))) {
+                    difference.setSequenceChanged(true);
+                    break;
+                }
+            }
+        } else {
+            // Just say yes
+            difference.setSequenceChanged(true);
+        }
+
+        // Count the number of vbucket differences
+        if (this.vbucketsCount == config.getVbucketsCount()) {
+            int vbucketsChanges = 0;
+            for (int i = 0; i < this.vbucketsCount; i++) {
+                vbucketsChanges += (this.getMaster(i) == config.getMaster(i)) ? 0 : 1;
+            }
+            difference.setVbucketsChanges(vbucketsChanges);
+        } else {
+            difference.setVbucketsChanges(-1);
+        }
+
+        return difference;
+    }
+
     public HashAlgorithm getHashAlgorithm() {
         return hashAlgorithm;
     }
+
+
 }

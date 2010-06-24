@@ -9,12 +9,17 @@
 
 package com.northscale.jvbucket;
 
-import static org.junit.Assert.assertEquals;
-
-import com.northscale.jvbucket.model.HashAlgorithm;
+import com.northscale.jvbucket.model.ConfigDifference;
+import net.spy.memcached.HashAlgorithm;
+import org.apache.commons.collections15.CollectionUtils;
 import org.junit.Test;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Eugene Shelestovich
@@ -66,6 +71,49 @@ public class TestConfigFactory {
                     "}" +
                     "}";
 
+    private final String cfg1 = "{\n" +
+            "  \"hashAlgorithm\": \"CRC\",\n" +
+            "  \"numReplicas\": 2,\n" +
+            "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\"],\n" +
+            "  \"vBucketMap\":\n" +
+            "    [\n" +
+            "      [0, 1, 2],\n" +
+            "      [1, 2, 0],\n" +
+            "      [2, 1, -1],\n" +
+            "      [1, 2, 0]\n" +
+            "    ]\n" +
+            "}";
+
+    private final String cfg2 = "{\n" +
+            "  \"hashAlgorithm\": \"CRC\",\n" +
+            "  \"numReplicas\": 2,\n" +
+            "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server4:11211\"],\n" +
+            "  \"vBucketMap\":\n" +
+            "    [\n" +
+            "      [0, 1, 2],\n" +
+            "      [1, 2, 0],\n" +
+            "      [2, 1, -1],\n" +
+            "      [0, 2, 0]\n" +
+            "    ]\n" +
+            "}";
+
+    private final String cfg3 = "{\n" +
+            "  \"hashAlgorithm\": \"CRC\",\n" +
+            "  \"numReplicas\": 1,\n" +
+            "  \"serverList\": [\"server1:11211\", \"server2:11210\"],\n" +
+            "  \"vBucketMap\":\n" +
+            "    [\n" +
+            "      [0, 1],\n" +
+            "      [1, 0],\n" +
+            "      [1, 0],\n" +
+            "      [0, 1],\n" +
+            "      [0, 1],\n" +
+            "      [1, 0],\n" +
+            "      [1, 0],\n" +
+            "      [0, 1]\n" +
+            "    ]\n" +
+            "}";
+
     private static final String filename = "test.json";
 
     private void doTest(String json) {
@@ -84,7 +132,7 @@ public class TestConfigFactory {
         assertEquals(3, config.getServersCount());
         assertEquals(2, config.getReplicasCount());
         assertEquals(4, config.getVbucketsCount());
-        assertEquals(HashAlgorithm.CRC, config.getHashAlgorithm());
+        assertEquals(HashAlgorithm.CRC32_HASH, config.getHashAlgorithm());
 
         assertEquals("server1:11211", config.getServer(0));
         assertEquals("server2:11210", config.getServer(1));
@@ -119,5 +167,32 @@ public class TestConfigFactory {
     public void testConfigFromFile() {
         URL url = this.getClass().getClassLoader().getResource(filename);
         doTestWithFile(url.getFile());
+    }
+
+    @Test
+    public void testCompareTo() {
+        ConfigFactory cf = new DefaultConfigFactory();
+        Config config1 = cf.createConfigFromString(cfg1);
+        Config config2 = cf.createConfigFromString(cfg2);
+        ConfigDifference diff = config1.compareTo(config2);
+        assertTrue(diff.isSequenceChanged());
+        assertEquals(1, diff.getVbucketsChanges());
+        assertEquals("server4:11211", diff.getServersAdded().get(0));
+        assertEquals("server3:11211", diff.getServersRemoved().get(0));
+
+        config2 = cf.createConfigFromString(cfg3);
+        diff = config1.compareTo(config2);
+        assertTrue(diff.isSequenceChanged());
+        assertEquals(-1, diff.getVbucketsChanges());
+        assertTrue(diff.getServersAdded().isEmpty());
+        assertEquals("server3:11211", diff.getServersRemoved().get(0));
+    }
+
+    @Test
+    public void testFoo() {
+        String[] a = new String[]{"a", "b", "c", "d"};
+        String[] b = new String[]{"a", "b", "c", "e"};
+
+        Collection c = CollectionUtils.subtract(Arrays.asList(b), Arrays.asList(a));
     }
 }

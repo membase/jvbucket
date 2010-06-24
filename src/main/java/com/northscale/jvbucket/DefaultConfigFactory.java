@@ -10,8 +10,8 @@
 package com.northscale.jvbucket;
 
 import com.northscale.jvbucket.exception.ConfigParsingException;
-import com.northscale.jvbucket.model.HashAlgorithm;
 import com.northscale.jvbucket.model.VBucket;
+import net.spy.memcached.HashAlgorithm;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,12 +60,30 @@ public class DefaultConfigFactory implements ConfigFactory {
         }
     }
 
+    private HashAlgorithm lookupHashAlgorithm(String algorithm) {
+        HashAlgorithm ha = HashAlgorithm.NATIVE_HASH;
+        if ("crc".equalsIgnoreCase(algorithm)) {
+            ha = HashAlgorithm.CRC32_HASH;
+        } else if ("fnv1_32".equalsIgnoreCase(algorithm)) {
+            ha = HashAlgorithm.FNV1_32_HASH;
+        } else if ("fnv1_64".equalsIgnoreCase(algorithm)) {
+            ha = HashAlgorithm.FNV1_64_HASH;
+        } else if ("fnv1a_32".equalsIgnoreCase(algorithm)) {
+            ha = HashAlgorithm.FNV1A_32_HASH;
+        } else if ("fnv1a_64".equalsIgnoreCase(algorithm)) {
+            ha = HashAlgorithm.FNV1A_64_HASH;
+        } else if ("md5".equalsIgnoreCase(algorithm)) {
+            ha = HashAlgorithm.KETAMA_HASH;
+        }
+        return ha;
+    }
+
     private Config parseJSON(JSONObject jsonObject) throws JSONException {
         // Allows clients to have a JSON envelope.
         if (jsonObject.has("vBucketServerMap")) {
             return parseJSON(jsonObject.getJSONObject("vBucketServerMap"));
         }
-        HashAlgorithm hashAlgorithm = HashAlgorithm.parse(jsonObject.getString("hashAlgorithm"));
+        HashAlgorithm hashAlgorithm = lookupHashAlgorithm(jsonObject.getString("hashAlgorithm"));
         int replicasCount = jsonObject.getInt("numReplicas");
         if (replicasCount > VBucket.MAX_REPLICAS) {
             throw new ConfigParsingException("Expected number <= " + VBucket.MAX_REPLICAS + " for replicas.");

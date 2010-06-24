@@ -9,8 +9,9 @@
 
 package com.northscale.jvbucket;
 
-import com.northscale.jvbucket.model.HashAlgorithm;
+import com.northscale.jvbucket.model.ConfigDifference;
 import com.northscale.jvbucket.model.VBucket;
+import net.spy.memcached.HashAlgorithm;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public interface Config {
 
     // VBucket access
 
-    int getVbucketByKey(Object key, int nkey);
+    int getVbucketByKey(String key);
 
     int getMaster(int vbucketIndex);
 
@@ -43,4 +44,9 @@ public interface Config {
 
     void setVbuckets(List<VBucket> vbuckets);
 
+    ConfigDifference compareTo(Config config);
+
+    List<String> getServers();
+
+    List<VBucket> getVbuckets();
 }
