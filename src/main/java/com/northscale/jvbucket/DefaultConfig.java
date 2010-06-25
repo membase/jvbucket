@@ -89,6 +89,16 @@ public class DefaultConfig implements Config {
         return vbuckets.get(vbucketIndex).getServers()[replicaIndex + 1];
     }
 
+    public int foundIncorrectMaster(int vbucket, int wrongServer) {
+        int mappedServer = this.vbuckets.get(vbucket).getServers()[0];
+        int rv = mappedServer;
+        if (mappedServer == wrongServer) {
+            rv = (rv + 1) % this.serversCount;
+            this.vbuckets.get(vbucket).getServers()[0] = rv;
+        }
+        return rv;
+    }
+
     public void setServers(List<String> servers) {
         this.servers = servers;
     }

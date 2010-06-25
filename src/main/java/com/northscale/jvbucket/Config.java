@@ -40,6 +40,8 @@ public interface Config {
 
     int getReplica(int vbucketIndex, int replicaIndex);
 
+    int foundIncorrectMaster(int vbucket, int wrongServer);
+
     void setServers(List<String> servers);
 
     void setVbuckets(List<VBucket> vbuckets);
@@ -49,4 +51,6 @@ public interface Config {
     List<String> getServers();
 
     List<VBucket> getVbuckets();
+
+
 }

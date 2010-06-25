@@ -189,10 +189,23 @@ public class TestConfigFactory {
     }
 
     @Test
-    public void testFoo() {
-        String[] a = new String[]{"a", "b", "c", "d"};
-        String[] b = new String[]{"a", "b", "c", "e"};
-
-        Collection c = CollectionUtils.subtract(Arrays.asList(b), Arrays.asList(a));
+    public void testWrongServer() {
+        ConfigFactory cf = new DefaultConfigFactory();
+        Config cfg = cf.createConfigFromString(config);
+        // Starts at 0
+        assertEquals(0, cfg.getMaster(0));
+        // Does not change when I told it I found the wrong thing
+        assertEquals(0, cfg.foundIncorrectMaster(0, 1));
+        assertEquals(0, cfg.getMaster(0));
+        // Does change if I tell it I got the right thing and it was wrong.
+        assertEquals(1, cfg.foundIncorrectMaster(0, 0));
+        assertEquals(1, cfg.getMaster(0));
+        // ...and again
+        assertEquals(2, cfg.foundIncorrectMaster(0, 1));
+        assertEquals(2, cfg.getMaster(0));
+        // ...and then wraps
+        assertEquals(0, cfg.foundIncorrectMaster(0, 2));
+        assertEquals(0, cfg.getMaster(0));
     }
+
 }
