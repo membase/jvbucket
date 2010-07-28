@@ -13,8 +13,6 @@ import com.northscale.jvbucket.model.ConfigDifference;
 import com.northscale.jvbucket.model.VBucket;
 import net.spy.memcached.HashAlgorithm;
 import org.apache.commons.collections15.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +21,6 @@ import java.util.List;
  * @author Eugene Shelestovich
  */
 public class DefaultConfig implements Config {
-
-    private final Log LOG = LogFactory.getLog(this.getClass());
 
     private HashAlgorithm hashAlgorithm = HashAlgorithm.NATIVE_HASH;
 

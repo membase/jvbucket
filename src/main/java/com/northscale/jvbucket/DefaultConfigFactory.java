@@ -13,8 +13,6 @@ import com.northscale.jvbucket.exception.ConfigParsingException;
 import com.northscale.jvbucket.model.VBucket;
 import net.spy.memcached.HashAlgorithm;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -30,8 +28,6 @@ import java.util.List;
  * @author Eugene Shelestovich
  */
 public class DefaultConfigFactory implements ConfigFactory {
-
-    private final Log LOG = LogFactory.getLog(this.getClass());
 
     public Config createConfigFromFile(String filename) {
         if (StringUtils.isBlank(filename)) {
