@@ -202,14 +202,12 @@
                 <artifactId>maven-eclipse-plugin</artifactId>
                 <configuration>
                     <downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-idea-plugin</artifactId>
                 <configuration>
                     <downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
                 </configuration>
             </plugin>
             <plugin>
@@ -230,6 +228,18 @@
                     <!-- Skip tests flag-->
                     <skip>true</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -276,10 +286,6 @@
                     <sourceEncoding>UTF-8</sourceEncoding>
                     <targetJdk>1.5</targetJdk>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
             </plugin>
         </plugins>
     </reporting>
