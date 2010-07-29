@@ -56,6 +56,14 @@ public class DefaultConfigFactory implements ConfigFactory {
         }
     }
 
+    public Config createConfigFromJSON(JSONObject jsonObject) {
+        try {
+            return parseJSON(jsonObject);
+        } catch (JSONException e) {
+            throw new ConfigParsingException("Exception parsing JSON data: " + e.getMessage());
+        }
+    }
+
     private HashAlgorithm lookupHashAlgorithm(String algorithm) {
         HashAlgorithm ha = HashAlgorithm.NATIVE_HASH;
         if ("crc".equalsIgnoreCase(algorithm)) {

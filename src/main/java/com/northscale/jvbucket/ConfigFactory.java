@@ -9,6 +9,8 @@
 
 package com.northscale.jvbucket;
 
+import org.codehaus.jettison.json.JSONObject;
+
 /**
  * @author Eugene Shelestovich
  */
@@ -18,4 +20,5 @@ public interface ConfigFactory {
 
     Config createConfigFromString(String data);
 
+    Config createConfigFromJSON(JSONObject jsonObject);
 }
